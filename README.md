@@ -13,6 +13,7 @@ python gui_pathfinder.py
 Currently only A* algorithm is available
 You can changes G value (value from origin) in vertical and horizontal direction
 
+
     x
     ^
     |
@@ -20,6 +21,7 @@ x <-x->x
     |
     v
     x
+
 
 Enable Diagonal Motion or not
 G value (value from origin) in Diagonal
