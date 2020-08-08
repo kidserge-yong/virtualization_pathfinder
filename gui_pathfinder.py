@@ -371,7 +371,7 @@ def main(test=False):
     # -------------------------------------------------------------------------
 	pygame.init()
 	surface = pygame.display.set_mode((WIDTH, WIDTH))
-	pygame.display.set_caption("Path Finding Algorithm (A*)")
+	pygame.display.set_caption("Path Finding Algorithm")
 
 
 	# -------------------------------------------------------------------------
@@ -401,9 +401,9 @@ def main(test=False):
 	def set_step(text, value):
 		step[0] = value
 
-	def start_the_game(function, value, config):
+	def start_the_game(WIN, value, config):
 		#print(config)
-		play_function(function, WIDTH, config)
+		play_function(WIN, WIDTH, config)
 
 
 	menu = pygame_menu.Menu(600, 600, 'Welcome',
