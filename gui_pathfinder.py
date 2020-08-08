@@ -11,6 +11,7 @@ verhor_g = [1.0]
 diagonal_g = [1.4]
 step = [False]
 
+
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 255, 0)
@@ -135,7 +136,7 @@ def wait():
 				return False
 				
 
-def algorithm(draw, grid, start, end, config):
+def algorithm_Astar(draw, grid, start, end, config):
 
 	is_allow_diagonal = config[0][0]
 	verti_horiz_g = config[1][0]
@@ -199,6 +200,48 @@ def algorithm(draw, grid, start, end, config):
 
 	return False
 
+def algorithm_BFS(draw, grid, start, end, config):
+	import queue
+
+	is_allow_diagonal = config[0][0]
+	verti_horiz_g = config[1][0]
+	diagonal_g = config[2][0]
+	is_wait = config[3][0]
+
+
+	came_from = {}
+	open_queue = queue.Queue()
+	open_queue.put(start)
+	current = start
+
+	while not open_queue.empty():
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				exit()
+
+		if current == end:
+			reconstruct_path(came_from, end, draw)
+			end.make_end()
+			start.make_start()
+			return True
+
+		current = open_queue.get()
+		if current.is_closed():
+			continue
+		for neighbor in current.neighbors:
+			if not neighbor.is_closed() and not neighbor.is_start():
+				came_from[neighbor] = current
+				open_queue.put(neighbor)
+				neighbor.make_open()
+
+		draw()
+		
+		if is_wait:
+			is_wait = wait()
+
+		if current != start:
+			current.make_closed()
 
 
 def make_grid(rows, width, is_allow_diagonal):
@@ -244,6 +287,7 @@ def get_clicked_pos(pos, rows, width):
 
 def play_function(win, width, config):
 	is_allow_diagonal = config[0][0]
+	algorithm = config[4][0]
 
 	ROWS = ROWS_SIZE
 	grid = make_grid(ROWS, width, is_allow_diagonal)
@@ -305,6 +349,8 @@ def play_function(win, width, config):
 	exit()
 
 
+algorithm = [algorithm_Astar]
+
 def main(test=False):
 	"""
 	Main program.
@@ -349,6 +395,9 @@ def main(test=False):
 	def set_diagonal_motion(text, value):
 		diagonal_motion[0] = value
 
+	def set_algorithm(text, value):
+		algorithm[0] = value
+
 	def set_step(text, value):
 		step[0] = value
 
@@ -360,7 +409,11 @@ def main(test=False):
 	menu = pygame_menu.Menu(600, 600, 'Welcome',
 						theme=pygame_menu.themes.THEME_BLUE)
 
-	menu.add_selector('Algorithm :',[('A*', 1)])
+	menu.add_selector('Algorithm :',
+						[('A*', algorithm_Astar),
+						('Breadth First Search (BFS)', algorithm_BFS)],
+						onchange=set_algorithm
+						)
 	menu.add_text_input('Vertical G value :', 
 						default = str(verhor_g[0]), 
 						onchange=set_verhor_g
@@ -386,12 +439,10 @@ def main(test=False):
 					start_the_game, 
 					surface, 
 					WIDTH, 
-					(diagonal_motion, verhor_g, diagonal_g, step))
+					(diagonal_motion, verhor_g, diagonal_g, step, algorithm))
 	menu.add_button('Quit', pygame_menu.events.EXIT)
 
 	menu.mainloop(surface)
-
-	pygame.display.flip()
 
 
 if __name__ == '__main__':
