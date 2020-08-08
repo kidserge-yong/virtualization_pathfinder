@@ -30,3 +30,9 @@ Enable Diagonal Motion or not
 G value (value from origin) in Diagonal
 
 Enable step to use left mouse click as step controller, right click to pass though every step.
+
+# Left Click to add start, end, blocked.
+# Middle Click to clear all spot.
+# Right Click to clear spot on cursor.
+# Spacebar to start algorithm
+# r to return to menu
