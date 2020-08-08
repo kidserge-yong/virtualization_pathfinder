@@ -1,6 +1,9 @@
 # virtualization_pathfinder
 This project was inspirited by Tech With Tim, feel free to go to his channel https://www.youtube.com/watch?v=jl5yUEdekEM.
 
+The program based on python.
+https://www.python.org/downloads/
+
 Program use pygame,
 Start by install all requirement using 
 ```
