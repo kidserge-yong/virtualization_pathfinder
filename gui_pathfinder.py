@@ -55,6 +55,9 @@ class Spot:
 	def is_end(self):
 		return self.color == TURQUOISE
 
+	def is_path(self):
+		return self.color == PURPLE
+
 	def reset(self):
 		self.color = WHITE
 
@@ -171,7 +174,7 @@ def algorithm_Astar(draw, grid, start, end, config):
 			end.make_end()
 			start.make_start()
 			return True
-
+		
 		neighbor_count = 0
 		for neighbor in current.neighbors:
 			if neighbor_count < 4:
@@ -336,6 +339,8 @@ def play_function(win, width, config):
 				if event.key == pygame.K_SPACE and start and end:
 					for row in grid:
 						for spot in row:
+							if spot.is_closed() or spot.is_open() or spot.is_path():
+								spot.reset()
 							spot.update_neighbors(grid)
 
 					algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end, config)
@@ -371,7 +376,7 @@ def main(test=False):
     # -------------------------------------------------------------------------
 	pygame.init()
 	surface = pygame.display.set_mode((WIDTH, WIDTH))
-	pygame.display.set_caption("Path Finding Algorithm")
+	pygame.display.set_caption("Path Finding Algorithm, (Left,Middle,Right Click, SpaceBar, r)")
 
 
 	# -------------------------------------------------------------------------
