@@ -25,8 +25,20 @@ TURQUOISE = (64, 224, 208)
 
 
 class Spot:
+	"""
+	Object represent each block on the screen
 
-	def __init__(self, row, col, width, total_rows, is_allow_diagonal):
+	Parameters:
+    row (int): row of the block
+	collumn (int): collumn of the block
+	width (int): size of row and collumn (in pixel), This case we use .rec. Therefore should be the same
+	total_rows (int): total number of rows
+
+    Returns:
+    None
+	"""
+
+	def __init__(self, row, col, width, total_rows):
 		self.row = row
 		self.col = col
 		self.x = row * width
@@ -35,54 +47,114 @@ class Spot:
 		self.neighbors = []
 		self.width = width
 		self.total_rows = total_rows
-		self.is_allow_diagonal = is_allow_diagonal
 
 	def get_pos(self):
+		"""
+		Returns:
+		:row (int), collumn (int): position of that spot
+		"""
 		return self.row, self.col
 
 	def is_closed(self):
+		"""
+		Returns:
+		True if the spot already make_close()
+		"""
 		return self.color == RED
 
 	def is_open(self):
+		"""
+		Returns:
+		True if the spot already make_open()
+		"""
 		return self.color == GREEN
 
 	def is_barrier(self):
+		"""
+		Returns:
+		True if the spot already make_barrier()
+		"""
 		return self.color == BLACK
 
 	def is_start(self):
+		"""
+		Returns:
+		True if the spot already make_start()
+		"""
 		return self.color == ORANGE
 
 	def is_end(self):
+		"""
+		Returns:
+		True if the spot already make_end()
+		"""
 		return self.color == TURQUOISE
 
 	def is_path(self):
+		"""
+		Returns:
+		True if the spot already make_path()
+		"""
 		return self.color == PURPLE
 
 	def reset(self):
+		"""
+		Return to initial state of spot
+		"""
 		self.color = WHITE
 
 	def make_start(self):
+		"""
+		Make spot to be start spot
+		"""
 		self.color = ORANGE
 
 	def make_closed(self):
+		"""
+		Make spot to be closed spot
+		"""
 		self.color = RED
 
 	def make_open(self):
+		"""
+		Make spot to be open spot
+		"""
 		self.color = GREEN
 
 	def make_barrier(self):
+		"""
+		Make spot to be barrier (cannot pass)
+		"""
 		self.color = BLACK
 
 	def make_end(self):
+		"""
+		Make spot to be end (cannot pass)
+		"""
 		self.color = TURQUOISE
 
 	def make_path(self):
+		"""
+		Make spot to path from start to end
+		"""
 		self.color = PURPLE
 
 	def draw(self, win):
+		"""
+		Draw color of spot
+		:win (pygame Surface): https://www.pygame.org/docs/ref/surface.html#:~:text=A%20pygame%20Surface%20is%20used,create%20a%20new%20image%20object.
+		"""
 		pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.width))
 
-	def update_neighbors(self, grid):
+	def update_neighbors(self, grid, is_allow_diagonal):
+		"""
+		Connect spot to neighbors spot
+
+		:grid (List[int][int]: Spot): grid is 2D array of spot
+		:is_allow_diagonal (bool): controller for neighbors
+
+		:return: None
+		"""
 		self.neighbors = []
 		if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_barrier(): # DOWN
 			self.neighbors.append(grid[self.row + 1][self.col])
@@ -96,7 +168,7 @@ class Spot:
 		if self.col > 0 and not grid[self.row][self.col - 1].is_barrier(): # LEFT
 			self.neighbors.append(grid[self.row][self.col - 1])
 
-		if not self.is_allow_diagonal: return
+		if not is_allow_diagonal: return
 
 		if self.row < self.total_rows - 1 and self.col < self.total_rows - 1 and not grid[self.row + 1][self.col + 1].is_barrier(): #DOWN RIGHT
 			self.neighbors.append(grid[self.row + 1][self.col + 1])
@@ -112,22 +184,49 @@ class Spot:
 
 
 	def __lt__(self, other):
+		"""
+		Less than function when compare spot with spot
+		:other (Spot): the spot we want to compare.
+
+		:return: None
+		"""
 		return False
 
 
 def h(p1, p2):
+	"""
+	h value function, find distance between 2 spots
+	:p1 (Spot): first spot
+	:p2 (Spot): second spot (conventionally end)
+
+	:return: None
+	"""
 	x1, y1 = p1
 	x2, y2 = p2
+	#return abs(x1 - x2) + abs(y1 - y2)
 	return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 
 def reconstruct_path(came_from, current, draw):
+	"""
+	track back using list of spot in came_from
+	:came_from (list[Spot]:Spot): list of spot represent path from start to end
+	:current (Spot): initial spot to track back to start spot
+	:draw (lambda: draw): draw every spot and update the pygame screen
+	
+	:return: None
+	"""
 	while current in came_from:
 		current = came_from[current]
 		current.make_path()
 		draw()
 
 def wait():
+	"""
+	Wait function to control step of program usign event handle in pygame
+	
+	:return: None
+	"""
 	while True:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -140,6 +239,16 @@ def wait():
 				
 
 def algorithm_Astar(draw, grid, start, end, config):
+	"""
+	Path finding A* algorithm
+	:draw (lambda: draw): draw every spot and update the pygame screen
+	:grid (List[int][int]: Spot): grid is 2D array of spot
+	:start (Spot): start spot
+	:end (Spot): end spot
+	:config (List[][]): detail configuration from pymenu
+
+	:return: None
+	"""
 
 	is_allow_diagonal = config[0][0]
 	verti_horiz_g = config[1][0]
@@ -204,6 +313,16 @@ def algorithm_Astar(draw, grid, start, end, config):
 	return False
 
 def algorithm_BFS(draw, grid, start, end, config):
+	"""
+	Path finding Breadth-first search algorithm
+	:draw (lambda: draw): draw every spot and update the pygame screen
+	:grid (List[int][int]: Spot): grid is 2D array of spot
+	:start (Spot): start spot
+	:end (Spot): end spot
+	:config (List[][]): detail configuration from pymenu
+
+	:return: None
+	"""
 	import queue
 
 	is_allow_diagonal = config[0][0]
@@ -247,19 +366,34 @@ def algorithm_BFS(draw, grid, start, end, config):
 			current.make_closed()
 
 
-def make_grid(rows, width, is_allow_diagonal):
+def make_grid(rows, width):
+	"""
+	Create Spot object into from rows and width data
+	:rows (int): number of rows and collumn needed
+	:width (int): size of width in pixel
+
+	:return: None
+	"""
 	grid = []
 	gap = width // rows
 	for i in range(rows):
 		grid.append([])
 		for j in range(rows):
-			spot = Spot(i, j, gap, rows, is_allow_diagonal)
+			spot = Spot(i, j, gap, rows)
 			grid[i].append(spot)
 
 	return grid
 
 
 def draw_grid(win, rows, width):
+	"""
+	Create grid (Line) of Spot object
+	:win (pygame Surface): https://www.pygame.org/docs/ref/surface.html#:~:text=A%20pygame%20Surface%20is%20used,create%20a%20new%20image%20object.
+	:rows (int): number of rows and collumn needed
+	:width (int): size of screen in pixel
+
+	:return: None
+	"""
 	gap = width // rows
 	for i in range(rows):
 		pygame.draw.line(win, GREY, (0, i * gap), (width, i * gap))
@@ -268,6 +402,15 @@ def draw_grid(win, rows, width):
 
 
 def draw(win, grid, rows, width):
+	"""
+	Create color of  each Spot object
+	:win (pygame Surface): https://www.pygame.org/docs/ref/surface.html#:~:text=A%20pygame%20Surface%20is%20used,create%20a%20new%20image%20object.
+	:grid (List[int][int]: Spot): grid is 2D array of spot
+	:rows (int): size of rows in pixel
+	:width (int): size of width in pixel
+
+	:return: None
+	"""
 	win.fill(WHITE)
 
 	for row in grid:
@@ -279,7 +422,15 @@ def draw(win, grid, rows, width):
 
 
 def get_clicked_pos(pos, rows, width):
-	gap = width // rows
+	"""
+	Calculate which row and col of spot was click
+	:pos ((x(int), y(int))): mouse cursor position https://www.pygame.org/docs/ref/mouse.html#pygame.mouse.get_pos
+	:rows (int): size of rows in pixel
+	:width (int): size of screen in pixel
+
+	:return: row (int), col (int) of spot that was clicked 
+	"""
+	gap = width // rows	# 1 row or 1 collumn is gap ratio 80/5 = 16
 	y, x = pos
 
 	row = y // gap
@@ -289,11 +440,19 @@ def get_clicked_pos(pos, rows, width):
 
 
 def play_function(win, width, config):
+	"""
+	Play Controller
+	:win (pygame Surface): https://www.pygame.org/docs/ref/surface.html#:~:text=A%20pygame%20Surface%20is%20used,create%20a%20new%20image%20object.
+	:width (int): size of screen in pixel
+	:config: detail configuration (changing)
+
+	:return: None
+	"""
 	is_allow_diagonal = config[0][0]
 	algorithm = config[4][0]
 
 	ROWS = ROWS_SIZE
-	grid = make_grid(ROWS, width, is_allow_diagonal)
+	grid = make_grid(ROWS, width)
 
 	start = None
 	end = None
@@ -323,7 +482,7 @@ def play_function(win, width, config):
 			elif pygame.mouse.get_pressed()[1]: # MIDDLE
 				start = None
 				end = None
-				grid = make_grid(ROWS, width, is_allow_diagonal)
+				grid = make_grid(ROWS, width)
 
 			elif pygame.mouse.get_pressed()[2]: # RIGHT
 				pos = pygame.mouse.get_pos()
@@ -341,7 +500,7 @@ def play_function(win, width, config):
 						for spot in row:
 							if spot.is_closed() or spot.is_open() or spot.is_path():
 								spot.reset()
-							spot.update_neighbors(grid)
+							spot.update_neighbors(grid, is_allow_diagonal)
 
 					algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end, config)
 
