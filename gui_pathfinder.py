@@ -372,7 +372,7 @@ def make_grid(rows, width):
 	:rows (int): number of rows and collumn needed
 	:width (int): size of width in pixel
 
-	:return: None
+	:return: :grid (List[int][int]: Spot): grid is 2D array of spot
 	"""
 	grid = []
 	gap = width // rows
