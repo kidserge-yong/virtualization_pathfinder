@@ -4,7 +4,11 @@ This project was inspirited by Tech With Tim, feel free to go to his channel htt
 ## The program based on python.
 https://www.python.org/downloads/
 
-Program use pygame,
+Program use 
+* pygame
+* pygame-menu
+* neat-python
+* pyperclip
 Start by install all requirement using 
 ```
 pip install -r requirement.txt
